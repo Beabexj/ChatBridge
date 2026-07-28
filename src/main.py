@@ -12,10 +12,10 @@ def main():
     hotkey_key = config.get("hotkey", "F8")
     
     # สร้างตัวแปลภาษา
-    translator = ChatTranslator(source=source_lang, target=target_lang)
+    translator = ChatTranslator(default_source=source_lang, default_target=target_lang)
     
     logger.info("ChatBridge Initialized")
-    logger.info(f"[{hotkey_key}] = Translate {source_lang} -> {target_lang}")
+    logger.info(f"[{hotkey_key}] = Auto-Translate (Thai<->Eng/Jap->Eng)")
     
     # ผูกปุ่มลัดเข้ากับฟังก์ชัน handle_hotkey
     keyboard.add_hotkey(hotkey_key, lambda: handle_hotkey(translator))
