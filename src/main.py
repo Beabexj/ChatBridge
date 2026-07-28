@@ -3,6 +3,7 @@ from config import load_config
 from translator import ChatTranslator
 from hotkey import handle_hotkey
 from logger import logger
+from version import __version__
 
 def main():
     # โหลด config
@@ -14,7 +15,7 @@ def main():
     # สร้างตัวแปลภาษา
     translator = ChatTranslator(default_source=source_lang, default_target=target_lang)
     
-    logger.info("ChatBridge Initialized")
+    logger.info(f"ChatBridge v{__version__} Initialized")
     logger.info(f"[{hotkey_key}] = Auto-Translate (Thai<->Eng/Jap->Eng)")
     
     # ผูกปุ่มลัดเข้ากับฟังก์ชัน handle_hotkey
