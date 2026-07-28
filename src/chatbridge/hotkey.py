@@ -1,7 +1,7 @@
 import time
 import pyautogui
 import pyperclip
-from logger import logger
+from chatbridge.logger import logger
 
 def handle_hotkey(translator):
     """

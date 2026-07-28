@@ -1,6 +1,6 @@
 import re
 from deep_translator import GoogleTranslator
-from logger import logger
+from chatbridge.logger import logger
 
 class TranslationResult:
     def __init__(self, success: bool, text: str = "", error: str = ""):

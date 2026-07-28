@@ -1,9 +1,9 @@
 import keyboard
-from config import load_config
-from translator import ChatTranslator
-from hotkey import handle_hotkey
-from logger import logger
-from version import __version__
+from chatbridge.config import load_config
+from chatbridge.translator import ChatTranslator
+from chatbridge.hotkey import handle_hotkey
+from chatbridge.logger import logger
+from chatbridge.version import __version__
 
 def main():
     # โหลด config

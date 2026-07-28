@@ -1,6 +1,6 @@
 import json
 import os
-from logger import logger
+from chatbridge.logger import logger
 
 CONFIG_FILE = "config.json"
 DEFAULT_CONFIG = {
