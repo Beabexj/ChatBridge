@@ -2,6 +2,7 @@ import keyboard
 from config import load_config
 from translator import ChatTranslator
 from hotkey import handle_hotkey
+from logger import logger
 
 def main():
     # โหลด config
@@ -13,13 +14,13 @@ def main():
     # สร้างตัวแปลภาษา
     translator = ChatTranslator(source=source_lang, target=target_lang)
     
-    print(f"ChatBridge Initialized")
-    print(f"[{hotkey_key}] = Translate {source_lang} -> {target_lang}")
+    logger.info("ChatBridge Initialized")
+    logger.info(f"[{hotkey_key}] = Translate {source_lang} -> {target_lang}")
     
     # ผูกปุ่มลัดเข้ากับฟังก์ชัน handle_hotkey
     keyboard.add_hotkey(hotkey_key, lambda: handle_hotkey(translator))
     
-    print("Press CTRL+C to exit.")
+    logger.info("Press CTRL+C to exit.")
     keyboard.wait()
 
 if __name__ == "__main__":

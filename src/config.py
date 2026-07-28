@@ -1,5 +1,6 @@
 import json
 import os
+from logger import logger
 
 CONFIG_FILE = "config.json"
 DEFAULT_CONFIG = {
@@ -19,5 +20,5 @@ def load_config():
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except json.JSONDecodeError:
-        print("Error reading config.json. Using default configuration.")
+        logger.warning("Error reading config.json. Using default configuration.")
         return DEFAULT_CONFIG

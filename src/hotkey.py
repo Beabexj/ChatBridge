@@ -1,6 +1,7 @@
 import time
 import pyautogui
 import pyperclip
+from logger import logger
 
 def handle_hotkey(translator):
     """
@@ -20,11 +21,11 @@ def handle_hotkey(translator):
         if not text:
             return
 
-        print("Original:", text)
+        logger.info(f"Original: {text}")
 
         translated = translator.translate(text)
 
-        print("Translated:", translated)
+        logger.info(f"Translated: {translated}")
 
         # วางข้อความใหม่
         pyperclip.copy(translated)
@@ -35,4 +36,4 @@ def handle_hotkey(translator):
         pyautogui.hotkey("ctrl", "v")
 
     except Exception as e:
-        print(f"Error handling hotkey: {e}")
+        logger.error(f"Error handling hotkey: {e}")
