@@ -1,44 +1,26 @@
-import time
 import keyboard
-import pyautogui
-import pyperclip
-from deep_translator import GoogleTranslator
+from config import load_config
+from translator import ChatTranslator
+from hotkey import handle_hotkey
 
-translator = GoogleTranslator(source="th", target="en")
+def main():
+    # โหลด config
+    config = load_config()
+    source_lang = config.get("source_lang", "th")
+    target_lang = config.get("target_lang", "en")
+    hotkey_key = config.get("hotkey", "F8")
+    
+    # สร้างตัวแปลภาษา
+    translator = ChatTranslator(source=source_lang, target=target_lang)
+    
+    print(f"ChatBridge Initialized")
+    print(f"[{hotkey_key}] = Translate {source_lang} -> {target_lang}")
+    
+    # ผูกปุ่มลัดเข้ากับฟังก์ชัน handle_hotkey
+    keyboard.add_hotkey(hotkey_key, lambda: handle_hotkey(translator))
+    
+    print("Press CTRL+C to exit.")
+    keyboard.wait()
 
-def translate_chat():
-    try:
-        # เลือกข้อความทั้งหมด
-        pyautogui.hotkey("ctrl", "a")
-        time.sleep(0.05)
-
-        # คัดลอก
-        pyautogui.hotkey("ctrl", "c")
-        time.sleep(0.1)
-
-        text = pyperclip.paste().strip()
-
-        if not text:
-            return
-
-        print("Original:", text)
-
-        translated = translator.translate(text)
-
-        print("Translated:", translated)
-
-        # วางข้อความใหม่
-        pyperclip.copy(translated)
-
-        pyautogui.hotkey("ctrl", "a")
-        time.sleep(0.05)
-
-        pyautogui.hotkey("ctrl", "v")
-
-    except Exception as e:
-        print(e)
-
-print("F8 = Translate Thai -> English")
-keyboard.add_hotkey("F8", translate_chat)
-
-keyboard.wait()
+if __name__ == "__main__":
+    main()
