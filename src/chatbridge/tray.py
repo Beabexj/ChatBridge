@@ -3,35 +3,14 @@ import sys
 import subprocess
 import threading
 import platform
+import webbrowser
 
 import pystray
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from chatbridge.logger import logger
 from chatbridge.version import __version__
-
-
-def _create_icon_image(color: str = "#22c55e") -> Image.Image:
-    """Create a simple circular icon programmatically."""
-    size = 64
-    image = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-    # Outer circle (colored fill)
-    draw.ellipse([4, 4, size - 4, size - 4], fill=color)
-    # Inner "C" shape hint: a white ring
-    draw.ellipse([14, 14, size - 14, size - 14], fill="#ffffff")
-    draw.ellipse([22, 22, size - 22, size - 22], fill=color)
-    return image
-
-
-def _load_icon() -> Image.Image:
-    """Load icon.ico from assets/ or fall back to generated icon."""
-    ico_path = os.path.join(
-        os.path.dirname(__file__), "..", "..", "assets", "icon.ico"
-    )
-    if os.path.exists(ico_path):
-        return Image.open(ico_path)
-    return _create_icon_image("#22c55e")
+from chatbridge.resources import load_icon, create_icon_image
 
 
 def _open_file_in_editor(path: str) -> None:
@@ -63,7 +42,7 @@ class TrayApp:
         self._hotkey_thread = hotkey_thread
         self._icon = pystray.Icon(
             "ChatBridge",
-            _load_icon(),
+            load_icon(),
             "ChatBridge",
             menu=self._build_menu(),
         )
@@ -77,22 +56,17 @@ class TrayApp:
         return pystray.Menu(
             # Header (read-only title)
             pystray.MenuItem(
-                f"ChatBridge  v{__version__}",
+                f"ChatBridge v{__version__}",
                 action=None,
                 enabled=False,
             ),
             pystray.Menu.SEPARATOR,
             # Toggle status
             pystray.MenuItem(
-                "Status",
-                pystray.Menu(
-                    pystray.MenuItem(
-                        "Enabled",
-                        self._toggle_enabled,
-                        checked=lambda item: self._enabled,
-                        radio=False,
-                    )
-                ),
+                "Enabled",
+                self._toggle_enabled,
+                checked=lambda item: self._enabled,
+                radio=False,
             ),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Settings...", self._open_settings),
@@ -111,7 +85,7 @@ class TrayApp:
         state = "Enabled" if self._enabled else "Disabled"
         logger.info(f"Translator {state}")
         # Update icon colour to reflect state
-        icon.icon = _load_icon() if self._enabled else _create_icon_image("#ef4444")
+        icon.icon = load_icon() if self._enabled else create_icon_image("#ef4444")
         icon.update_menu()
 
     def _open_settings(self, icon, item) -> None:
@@ -125,10 +99,14 @@ class TrayApp:
         from tkinter import messagebox
         root = tk.Tk()
         root.withdraw()  # Hide the root window
-        messagebox.showinfo(
+        
+        # ถามผู้ใช้เพื่อให้คลิกปุ่ม OK
+        response = messagebox.askokcancel(
             "About ChatBridge",
-            f"ChatBridge  v{__version__}\n\nTranslate game chat with one hotkey.\n\nPython {sys.version.split()[0]}",
+            f"ChatBridge\nVersion {__version__}\nMIT License\nGitHub: https://github.com/Beabexj/ChatBridge\n\nClick OK to open GitHub page.",
         )
+        if response:
+            webbrowser.open("https://github.com/Beabexj/ChatBridge")
         root.destroy()
 
     def _exit(self, icon, item) -> None:
@@ -146,7 +124,7 @@ class TrayApp:
         state = "Enabled" if self._enabled else "Disabled"
         logger.info(f"Translator {state} (via left-click)")
         if self._icon:
-            self._icon.icon = _load_icon() if self._enabled else _create_icon_image("#ef4444")
+            self._icon.icon = load_icon() if self._enabled else create_icon_image("#ef4444")
             self._icon.update_menu()
 
     @property
