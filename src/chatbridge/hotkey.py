@@ -3,10 +3,17 @@ import pyautogui
 import pyperclip
 from chatbridge.logger import logger
 
-def handle_hotkey(translator):
+
+def handle_hotkey(translator, tray_app=None) -> None:
     """
-    Simulate keyboard shortcuts to copy text, translate it, and paste it back.
+    Copy text, translate it, and paste it back.
+    Respects the enabled/disabled state from the tray.
     """
+    # If tray app exists and is disabled, do nothing
+    if tray_app is not None and not tray_app.is_enabled:
+        logger.debug("Hotkey fired but translator is disabled. Skipping.")
+        return
+
     try:
         # เลือกข้อความทั้งหมด
         pyautogui.hotkey("ctrl", "a")
@@ -27,7 +34,7 @@ def handle_hotkey(translator):
 
         if result.success:
             logger.info(f"Translated: {result.text}")
-            
+
             # วางข้อความใหม่
             pyperclip.copy(result.text)
             pyautogui.hotkey("ctrl", "a")
@@ -38,3 +45,4 @@ def handle_hotkey(translator):
 
     except Exception as e:
         logger.error(f"Error handling hotkey: {e}")
+
