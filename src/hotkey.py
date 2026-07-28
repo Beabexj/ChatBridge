@@ -23,17 +23,18 @@ def handle_hotkey(translator):
 
         logger.info(f"Original: {text}")
 
-        translated = translator.translate(text)
+        result = translator.translate(text)
 
-        logger.info(f"Translated: {translated}")
-
-        # วางข้อความใหม่
-        pyperclip.copy(translated)
-
-        pyautogui.hotkey("ctrl", "a")
-        time.sleep(0.05)
-
-        pyautogui.hotkey("ctrl", "v")
+        if result.success:
+            logger.info(f"Translated: {result.text}")
+            
+            # วางข้อความใหม่
+            pyperclip.copy(result.text)
+            pyautogui.hotkey("ctrl", "a")
+            time.sleep(0.05)
+            pyautogui.hotkey("ctrl", "v")
+        else:
+            logger.error(f"Failed to translate: {result.error}")
 
     except Exception as e:
         logger.error(f"Error handling hotkey: {e}")
