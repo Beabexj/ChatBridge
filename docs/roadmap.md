@@ -10,13 +10,13 @@
 - [x] config.json
 
 ## v0.4
-- [ ] Auto Detect Language
+- [x] Auto Detect Language
 
 ## v0.5
-- [ ] ป้องกันกด F8 ซ้อน
+- [x] Refactor to `chatbridge` package
 
 ## v0.6
-- [ ] System Tray
+- [x] System Tray (Enable/Disable, Open Logs, About, Exit)
 
 ## v0.7
 - [ ] Build .exe

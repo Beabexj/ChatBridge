@@ -2,3 +2,5 @@ deep-translator==1.11.4
 keyboard==0.13.5
 PyAutoGUI==0.9.54
 pyperclip==1.11.0
+pystray==0.19.5
+pillow==12.3.0
