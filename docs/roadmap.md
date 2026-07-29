@@ -19,7 +19,19 @@
 - [x] System Tray (Enable/Disable, Open Logs, About, Exit)
 
 ## v0.7
-- [ ] Build .exe
+- [x] Settings UI (Tkinter)
+
+## v0.8.0
+- [ ] Packaging (PyInstaller, resources.py, build.bat)
+
+## v0.8.1
+- [ ] Fix Packaging Bugs
+
+## v0.8.2
+- [ ] Polish EXE (Metadata, Version Info)
+
+## v0.9
+- [ ] Start with Windows & Installer
 
 ## v1.0
-- [ ] Release
+- [ ] Public Release

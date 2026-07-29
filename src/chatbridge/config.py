@@ -1,8 +1,12 @@
 import json
 import os
+from pathlib import Path
 from chatbridge.logger import logger
+from chatbridge.resources import get_app_dir
 
-CONFIG_FILE = "config.json"
+def get_config_path() -> Path:
+    return get_app_dir() / "config.json"
+
 DEFAULT_CONFIG = {
     "hotkey": "F8",
     "source_lang": "auto",
@@ -15,11 +19,12 @@ DEFAULT_CONFIG = {
 
 def load_config():
     """Load configuration from file, or create a default one if it doesn't exist."""
-    if not os.path.exists(CONFIG_FILE):
+    config_file = get_config_path()
+    if not config_file.exists():
         return save_config(DEFAULT_CONFIG)
     
     try:
-        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+        with open(config_file, "r", encoding="utf-8") as f:
             config = json.load(f)
             # Merge with default config to ensure all keys exist
             merged = DEFAULT_CONFIG.copy()
@@ -31,8 +36,9 @@ def load_config():
 
 def save_config(config_data):
     """Save configuration dict to file."""
+    config_file = get_config_path()
     try:
-        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+        with open(config_file, "w", encoding="utf-8") as f:
             json.dump(config_data, f, indent=4)
         logger.info("Configuration saved successfully.")
     except Exception as e:

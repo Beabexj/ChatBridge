@@ -117,7 +117,9 @@ class TrayApp:
                 self.on_hotkey_changed(new_hotkey)
 
     def _open_logs(self, icon, item) -> None:
-        _open_file_in_editor(os.path.join("logs", "app.log"))
+        from chatbridge.resources import get_app_dir
+        log_path = get_app_dir() / "logs" / "app.log"
+        _open_file_in_editor(str(log_path))
 
     def _show_about(self, icon, item) -> None:
         import tkinter as tk
