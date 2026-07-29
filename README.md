@@ -34,7 +34,7 @@ ChatBridge is a seamless background utility that allows you to translate game ch
    - The text will automatically be copied, translated, and pasted back in place!
 
 ## Configuration
-Upon first run, a `config.json` file is generated at the root directory. You can edit this file to change the hotkey and default source/target languages.
+Upon first run, a `config.json` file is generated at `%LOCALAPPDATA%\ChatBridge\config.json`. You can edit this file or use the built-in Settings window (right-click the tray icon) to change the hotkey and default source/target languages.
 
 ## Roadmap
 See our plans for future development in [docs/roadmap.md](docs/roadmap.md).

@@ -22,13 +22,13 @@
 - [x] Settings UI (Tkinter)
 
 ## v0.8.0
-- [ ] Packaging (PyInstaller, resources.py, build.bat)
+- [x] Packaging (PyInstaller, resources.py, build.bat)
 
 ## v0.8.1
-- [ ] Fix Packaging Bugs
+- [x] Fix Packaging Bugs (AppData Migration)
 
 ## v0.8.2
-- [ ] Polish EXE (Metadata, Version Info)
+- [x] Polish EXE (Metadata, Version Info)
 
 ## v0.9
 - [ ] Start with Windows & Installer

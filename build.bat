@@ -7,6 +7,7 @@ set PYTHONPATH=src
 python -m PyInstaller --onefile --windowed ^
             --name "ChatBridge" ^
             --icon "assets/icon.ico" ^
+            --version-file "assets/file_version_info.txt" ^
             --add-data "assets/icon.ico;assets" ^
             --paths src ^
             run.py

@@ -15,11 +15,11 @@ def resource_path(relative_path: str) -> Path:
     return base / relative_path
 
 def get_app_dir() -> Path:
-    """Get the directory where the app executable or main script lives."""
-    if getattr(sys, "frozen", False):
-        return Path(sys.executable).parent
-    else:
-        return Path(__file__).resolve().parent.parent.parent
+    """Get the directory where the app data (config, logs) is stored."""
+    # Use %LOCALAPPDATA%\ChatBridge to avoid polluting Desktop or Program Files
+    app_dir = Path(os.getenv("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "ChatBridge"
+    app_dir.mkdir(parents=True, exist_ok=True)
+    return app_dir
 
 def create_icon_image(color: str = "#22c55e") -> Image.Image:
     """Create a simple circular icon programmatically."""
