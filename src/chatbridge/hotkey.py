@@ -1,6 +1,6 @@
 import time
 import pyperclip
-import keyboard
+import pyautogui
 from chatbridge.logger import logger
 
 
@@ -16,7 +16,7 @@ def handle_hotkey(translator, tray_app=None) -> None:
 
     try:
         # คัดลอกข้อความที่ถูกลากคลุม (highlighted)
-        keyboard.send("ctrl+c")
+        pyautogui.hotkey("ctrl", "c")
         time.sleep(0.15)  # รอให้ clipboard อัปเดต
 
         text = pyperclip.paste().strip()
@@ -34,7 +34,7 @@ def handle_hotkey(translator, tray_app=None) -> None:
             # วางข้อความใหม่ทับที่เดิมที่ถูกลากคลุมอยู่
             pyperclip.copy(result.text)
             time.sleep(0.15)  # รอให้ clipboard พร้อม
-            keyboard.send("ctrl+v")
+            pyautogui.hotkey("ctrl", "v")
             time.sleep(0.05)
             
             # ถ้าตั้งค่า auto_send ให้กด Enter ด้วย
@@ -42,7 +42,7 @@ def handle_hotkey(translator, tray_app=None) -> None:
                 from chatbridge.config import load_config
                 config = load_config()
                 if config.get("auto_send", False):
-                    keyboard.send("enter")
+                    pyautogui.press("enter")
             except Exception as e:
                 logger.error(f"Error reading auto_send config: {e}")
                 
