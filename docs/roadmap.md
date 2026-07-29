@@ -30,8 +30,31 @@
 ## v0.8.2
 - [x] Polish EXE (Metadata, Version Info)
 
-## v0.9
-- [ ] Start with Windows & Installer
+## v0.9 Beta (Quality & Usability)
+- [ ] v0.9.0 Performance Profiling & Latency Diagnostics
+- [ ] Start with Windows
+- [ ] Import / Export Settings
+- [ ] Open Config Folder & Open Log Folder in UI
+- [ ] Reset Settings
+- [ ] Polish About Dialog
+- [ ] Quality Assurance: Smoke Test, Memory Leak Test, Hotkey Stress Test, 8-hour continuous test
 
-## v1.0
-- [ ] Public Release
+## v0.9.5 RC (Release Candidate)
+- [ ] Complete Documentation (README, CHANGELOG, LICENSE, Release Notes)
+- [ ] Add Screenshots
+- [ ] Closed Alpha Testing (3-5 users)
+
+## v1.0 Stable (Production Ready)
+- [ ] Diagnostics & Health Check (Config, Logs, Network, Translator status)
+- [ ] Tray Status Indicator (Yellow if degraded, Green if healthy)
+- [ ] Crash Reporter (`crash.log` with traceback, OS version, etc.)
+- [ ] Dogfooding Feedback Implementation (e.g., remember settings window position, ESC to cancel, hotkey conflicts)
+- [ ] 0 Critical Bugs, VM tested, Build passes
+
+## Post v1.0 Goals
+- [ ] v1.1 Bug Fixes
+- [ ] v1.2 Better UX
+- [ ] v1.5 GitHub Actions + Auto Build
+- [ ] v2.0 Plugin System
+- [ ] v2.5 Multiple Translation Providers
+- [ ] v3.0 Cross Platform (Windows/Linux)

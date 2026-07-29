@@ -17,6 +17,8 @@ def handle_hotkey(translator, tray_app=None) -> None:
         return
 
     try:
+        t0 = time.perf_counter()
+        
         # 1. แบ็คอัปข้อความใน clipboard เดิม
         old_clipboard = pyperclip.paste()
         
@@ -42,6 +44,9 @@ def handle_hotkey(translator, tray_app=None) -> None:
             text = pyperclip.paste().strip()
             replace_all = True # จดจำไว้ว่าตอนวางต้องคลุมดำทั้งหมดเพื่อวางทับ
 
+        t_selection = time.perf_counter()
+        selection_ms = (t_selection - t0) * 1000
+
         if not text:
             # ถ้ายังไม่มีข้อความอีก คืนค่า clipboard เดิม
             if old_clipboard:
@@ -50,12 +55,15 @@ def handle_hotkey(translator, tray_app=None) -> None:
 
         logger.info(f"Original: {text}")
 
+        # --- Translation Phase ---
         result = translator.translate(text)
+        t_translate = time.perf_counter()
+        translate_ms = (t_translate - t_selection) * 1000
 
         if result.success:
             logger.info(f"Translated: {result.text}")
 
-            # วางข้อความใหม่
+            # --- Paste Phase ---
             pyperclip.copy(result.text)
             time.sleep(0.1) 
             
@@ -67,7 +75,10 @@ def handle_hotkey(translator, tray_app=None) -> None:
             pyautogui.hotkey("ctrl", "v")
             time.sleep(0.05)
             
-            # ถ้าตั้งค่า auto_send ให้กด Enter ด้วย
+            t_paste = time.perf_counter()
+            paste_ms = (t_paste - t_translate) * 1000
+            
+            # --- Auto Send Phase ---
             try:
                 from chatbridge.config import load_config
                 config = load_config()
@@ -75,6 +86,23 @@ def handle_hotkey(translator, tray_app=None) -> None:
                     pyautogui.press("enter")
             except Exception as e:
                 logger.error(f"Error reading auto_send config: {e}")
+            
+            t_send = time.perf_counter()
+            send_ms = (t_send - t_paste) * 1000
+            
+            total_ms = (t_send - t0) * 1000
+            
+            # Log performance metrics
+            perf_log = (
+                f"\n[PERF]\n"
+                f"Selection : {selection_ms:.0f} ms\n"
+                f"Copy      : (Included in Selection)\n"
+                f"Translate : {translate_ms:.0f} ms\n"
+                f"Paste     : {paste_ms:.0f} ms\n"
+                f"Auto Send : {send_ms:.0f} ms\n"
+                f"Total     : {total_ms:.0f} ms"
+            )
+            logger.info(perf_log)
                 
         else:
             logger.error(f"Failed to translate: {result.error}")
