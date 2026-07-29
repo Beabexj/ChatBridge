@@ -5,6 +5,22 @@ from chatbridge.logger import logger
 
 # ป้องกันโปรแกรมแครชถ้าวางเมาส์ไว้มุมจอใน VM
 pyautogui.FAILSAFE = False
+# ปิดความหน่วง 0.1s อัตโนมัติในทุกคำสั่งของ pyautogui เพื่อความเร็วสูงสุด
+pyautogui.PAUSE = 0
+
+def _wait_for_clipboard_text(timeout=0.1, poll_interval=0.01):
+    """
+    Poll the clipboard until non-empty text appears, up to a timeout.
+    Returns the stripped text if found, or empty string.
+    """
+    elapsed = 0
+    while elapsed < timeout:
+        text = pyperclip.paste().strip()
+        if text:
+            return text
+        time.sleep(poll_interval)
+        elapsed += poll_interval
+    return ""
 
 def handle_hotkey(translator, tray_app=None) -> None:
     """
@@ -24,24 +40,22 @@ def handle_hotkey(translator, tray_app=None) -> None:
         
         # 2. ล้าง clipboard เพื่อเช็คว่ามีการคลุมดำข้อความไว้หรือไม่
         pyperclip.copy('')
-        time.sleep(0.05)
-
+        
         # 3. ลองก๊อปปี้สิ่งที่คลุมดำอยู่
         pyautogui.hotkey("ctrl", "c")
-        time.sleep(0.1)
 
-        text = pyperclip.paste().strip()
+        # รอให้ OS ทำงาน และเช็ค clipboard แบบไวๆ (สูงสุด 0.1 วินาที)
+        text = _wait_for_clipboard_text()
         replace_all = False
 
         # 4. ถ้าไม่มีข้อความเข้ามา แปลว่าผู้ใช้ไม่ได้คลุมดำไว้ -> ทำการ Select All (Ctrl+A) ให้เอง
         if not text:
             logger.debug("No text highlighted. Falling back to select all (ctrl+a).")
             pyautogui.hotkey("ctrl", "a")
-            time.sleep(0.05)
+            time.sleep(0.02) # รอ UI เลือกข้อความแป๊บเดียว
             pyautogui.hotkey("ctrl", "c")
-            time.sleep(0.1)
             
-            text = pyperclip.paste().strip()
+            text = _wait_for_clipboard_text()
             replace_all = True # จดจำไว้ว่าตอนวางต้องคลุมดำทั้งหมดเพื่อวางทับ
 
         t_selection = time.perf_counter()
@@ -65,15 +79,15 @@ def handle_hotkey(translator, tray_app=None) -> None:
 
             # --- Paste Phase ---
             pyperclip.copy(result.text)
-            time.sleep(0.1) 
+            time.sleep(0.01) # รอให้ clipboard ลงทะเบียน
             
             if replace_all:
                 # ถ้าตอนแรกเรา select all ตอนวางก็ต้อง select all อีกรอบเพื่อทับของเดิม
                 pyautogui.hotkey("ctrl", "a")
-                time.sleep(0.05)
+                time.sleep(0.02)
                 
             pyautogui.hotkey("ctrl", "v")
-            time.sleep(0.05)
+            time.sleep(0.02) # รอ OS เอาข้อความจาก clipboard ไปวางบน UI ก่อนจะทำอย่างอื่น
             
             t_paste = time.perf_counter()
             paste_ms = (t_paste - t_translate) * 1000
@@ -111,4 +125,3 @@ def handle_hotkey(translator, tray_app=None) -> None:
 
     except Exception as e:
         logger.error(f"Error handling hotkey: {e}")
-

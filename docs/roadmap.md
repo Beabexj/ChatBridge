@@ -31,7 +31,7 @@
 - [x] Polish EXE (Metadata, Version Info)
 
 ## v0.9 Beta (Quality & Usability)
-- [ ] v0.9.0 Performance Profiling & Latency Diagnostics
+- [x] v0.9.0 Performance Profiling & Latency Diagnostics
 - [ ] Start with Windows
 - [ ] Import / Export Settings
 - [ ] Open Config Folder & Open Log Folder in UI
