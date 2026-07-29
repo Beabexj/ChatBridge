@@ -3,6 +3,8 @@ import pyperclip
 import pyautogui
 from chatbridge.logger import logger
 
+# ป้องกันโปรแกรมแครชถ้าวางเมาส์ไว้มุมจอใน VM
+pyautogui.FAILSAFE = False
 
 def handle_hotkey(translator, tray_app=None) -> None:
     """
@@ -15,13 +17,35 @@ def handle_hotkey(translator, tray_app=None) -> None:
         return
 
     try:
-        # คัดลอกข้อความที่ถูกลากคลุม (highlighted)
+        # 1. แบ็คอัปข้อความใน clipboard เดิม
+        old_clipboard = pyperclip.paste()
+        
+        # 2. ล้าง clipboard เพื่อเช็คว่ามีการคลุมดำข้อความไว้หรือไม่
+        pyperclip.copy('')
+        time.sleep(0.05)
+
+        # 3. ลองก๊อปปี้สิ่งที่คลุมดำอยู่
         pyautogui.hotkey("ctrl", "c")
-        time.sleep(0.15)  # รอให้ clipboard อัปเดต
+        time.sleep(0.1)
 
         text = pyperclip.paste().strip()
+        replace_all = False
+
+        # 4. ถ้าไม่มีข้อความเข้ามา แปลว่าผู้ใช้ไม่ได้คลุมดำไว้ -> ทำการ Select All (Ctrl+A) ให้เอง
+        if not text:
+            logger.debug("No text highlighted. Falling back to select all (ctrl+a).")
+            pyautogui.hotkey("ctrl", "a")
+            time.sleep(0.05)
+            pyautogui.hotkey("ctrl", "c")
+            time.sleep(0.1)
+            
+            text = pyperclip.paste().strip()
+            replace_all = True # จดจำไว้ว่าตอนวางต้องคลุมดำทั้งหมดเพื่อวางทับ
 
         if not text:
+            # ถ้ายังไม่มีข้อความอีก คืนค่า clipboard เดิม
+            if old_clipboard:
+                pyperclip.copy(old_clipboard)
             return
 
         logger.info(f"Original: {text}")
@@ -31,9 +55,15 @@ def handle_hotkey(translator, tray_app=None) -> None:
         if result.success:
             logger.info(f"Translated: {result.text}")
 
-            # วางข้อความใหม่ทับที่เดิมที่ถูกลากคลุมอยู่
+            # วางข้อความใหม่
             pyperclip.copy(result.text)
-            time.sleep(0.15)  # รอให้ clipboard พร้อม
+            time.sleep(0.1) 
+            
+            if replace_all:
+                # ถ้าตอนแรกเรา select all ตอนวางก็ต้อง select all อีกรอบเพื่อทับของเดิม
+                pyautogui.hotkey("ctrl", "a")
+                time.sleep(0.05)
+                
             pyautogui.hotkey("ctrl", "v")
             time.sleep(0.05)
             
@@ -48,6 +78,8 @@ def handle_hotkey(translator, tray_app=None) -> None:
                 
         else:
             logger.error(f"Failed to translate: {result.error}")
+            if old_clipboard:
+                pyperclip.copy(old_clipboard)
 
     except Exception as e:
         logger.error(f"Error handling hotkey: {e}")
