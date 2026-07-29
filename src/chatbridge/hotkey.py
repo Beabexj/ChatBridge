@@ -1,12 +1,15 @@
 import time
 import pyperclip
 import pyautogui
+import threading
 from chatbridge.logger import logger
 
 # ป้องกันโปรแกรมแครชถ้าวางเมาส์ไว้มุมจอใน VM
 pyautogui.FAILSAFE = False
 # ปิดความหน่วง 0.1s อัตโนมัติในทุกคำสั่งของ pyautogui เพื่อความเร็วสูงสุด
 pyautogui.PAUSE = 0
+
+_translation_lock = threading.Lock()
 
 def _wait_for_clipboard_text(timeout=0.1, poll_interval=0.01):
     """
@@ -23,6 +26,24 @@ def _wait_for_clipboard_text(timeout=0.1, poll_interval=0.01):
     return ""
 
 def handle_hotkey(translator, tray_app=None) -> None:
+    """
+    Entry point for the hotkey. Spawns a background thread so the 
+    keyboard listener callback returns instantly, preventing Windows 
+    from silently dropping the hook due to LowLevelHooksTimeout.
+    """
+    if not _translation_lock.acquire(blocking=False):
+        logger.debug("Translation already in progress. Ignoring hotkey.")
+        return
+
+    def worker():
+        try:
+            _handle_hotkey_sync(translator, tray_app)
+        finally:
+            _translation_lock.release()
+
+    threading.Thread(target=worker, daemon=True).start()
+
+def _handle_hotkey_sync(translator, tray_app=None) -> None:
     """
     Copy text, translate it, and paste it back.
     Respects the enabled/disabled state from the tray.
