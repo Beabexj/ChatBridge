@@ -27,11 +27,13 @@ def _open_file_in_editor(path: str) -> None:
 
 
 class TrayApp:
-    def __init__(self, translator, hotkey_key: str):
+    def __init__(self, translator, hotkey_key: str, on_hotkey_changed=None):
         self._translator = translator
         self._hotkey_key = hotkey_key
+        self.on_hotkey_changed = on_hotkey_changed
         self._enabled = True  # Translator starts enabled
         self._icon: pystray.Icon | None = None
+        self._settings_window_open = False
 
     # ------------------------------------------------------------------ #
     #  Public API                                                          #
@@ -89,7 +91,30 @@ class TrayApp:
         icon.update_menu()
 
     def _open_settings(self, icon, item) -> None:
-        _open_file_in_editor("config.json")
+        if self._settings_window_open:
+            return  # Prevent opening multiple instances
+            
+        def launch_settings():
+            self._settings_window_open = True
+            from chatbridge.settings import SettingsWindow
+            app = SettingsWindow(on_save_callback=self._on_settings_saved)
+            app.run()
+            self._settings_window_open = False
+            
+        threading.Thread(target=launch_settings, daemon=True).start()
+
+    def _on_settings_saved(self, new_config: dict) -> None:
+        """Callback fired when user clicks Save in SettingsWindow."""
+        # 1. Update translator target language dynamically
+        if hasattr(self._translator, "default_target"):
+            self._translator.default_target = new_config.get("target_lang", "en")
+            
+        # 2. Update hotkey if callback provided
+        new_hotkey = new_config.get("hotkey", "F8")
+        if new_hotkey != self._hotkey_key:
+            self._hotkey_key = new_hotkey
+            if self.on_hotkey_changed:
+                self.on_hotkey_changed(new_hotkey)
 
     def _open_logs(self, icon, item) -> None:
         _open_file_in_editor(os.path.join("logs", "app.log"))

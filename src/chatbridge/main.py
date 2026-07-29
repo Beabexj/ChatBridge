@@ -19,6 +19,20 @@ def _start_hotkey_listener(hotkey_key: str, translator, tray_app: TrayApp) -> No
     keyboard.wait()  # Blocks this thread
 
 
+def reload_hotkey(new_hotkey: str, translator, tray_app: TrayApp):
+    """Update the hotkey dynamically."""
+    logger.info(f"Changing hotkey to: {new_hotkey}")
+    try:
+        keyboard.unhook_all()
+        keyboard.add_hotkey(
+            new_hotkey,
+            lambda: handle_hotkey(translator, tray_app),
+        )
+        logger.info("Hotkey updated successfully.")
+    except Exception as e:
+        logger.error(f"Failed to update hotkey: {e}")
+
+
 def main() -> None:
     # โหลด config
     config = load_config()
@@ -32,8 +46,12 @@ def main() -> None:
     logger.info(f"ChatBridge v{__version__} Initialized")
     logger.info(f"[{hotkey_key}] = Auto-Translate (Thai<->Eng/Jap->Eng)")
 
-    # สร้าง TrayApp
-    tray_app = TrayApp(translator=translator, hotkey_key=hotkey_key)
+    # สร้าง TrayApp พร้อมรับ callback เมื่อ hotkey เปลี่ยน
+    tray_app = TrayApp(
+        translator=translator, 
+        hotkey_key=hotkey_key,
+        on_hotkey_changed=lambda new_key: reload_hotkey(new_key, translator, tray_app)
+    )
 
     # รัน Hotkey Listener บน Background Thread
     hotkey_thread = threading.Thread(
