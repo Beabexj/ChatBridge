@@ -4,7 +4,7 @@ rmdir /s /q build dist
 
 echo Building ChatBridge...
 set PYTHONPATH=src
-python -m PyInstaller --noconsole ^
+python -m PyInstaller --onefile --windowed ^
             --name "ChatBridge" ^
             --icon "assets/icon.ico" ^
             --add-data "assets/icon.ico;assets" ^
