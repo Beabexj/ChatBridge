@@ -1,5 +1,9 @@
 {
-    "hotkey": "F8",
+    "hotkey": "F1",
     "source_lang": "th",
-    "target_lang": "en"
+    "target_lang": "en",
+    "auto_send": false,
+    "enabled": true,
+    "start_with_windows": false,
+    "log_level": "INFO"
 }

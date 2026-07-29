@@ -40,6 +40,17 @@ def handle_hotkey(translator, tray_app=None) -> None:
             pyautogui.hotkey("ctrl", "a")
             time.sleep(0.05)
             pyautogui.hotkey("ctrl", "v")
+            time.sleep(0.05)
+            
+            # ถ้าตั้งค่า auto_send ให้กด Enter ด้วย
+            try:
+                from chatbridge.config import load_config
+                config = load_config()
+                if config.get("auto_send", False):
+                    pyautogui.press("enter")
+            except Exception as e:
+                logger.error(f"Error reading auto_send config: {e}")
+                
         else:
             logger.error(f"Failed to translate: {result.error}")
 
